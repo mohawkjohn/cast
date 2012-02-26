@@ -6,8 +6,6 @@ require 'rubygems'
 require 'rake/testtask'
 require 'rubygems/package_task'
 
-FILES = FileList['README', 'ChangeLog', '{lib,ext,doc,test}/**/*', 'ext/yylex.c', 'lib/cast/c.tab.rb']
-
 # cast_ext
 file 'ext/cast/cast_ext.so' =>
      FileList['ext/cast/*.c', 'ext/cast/yylex.c'] do |t|
@@ -45,28 +43,6 @@ task :irb => :lib do
   sh 'irb -Ilib:ext -rcast'
 end
 
-spec = Gem::Specification.new do |s|
-  s.name = 'cast'
-  s.summary = "C parser and AST constructor."
-  s.version = '0.1.0'
-  s.author = 'George Ogata'
-  s.email = 'george.ogata@gmail.com'
-  s.homepage = 'http://cast.rubyforge.org'
-  s.rubyforge_project = 'cast'
-
-  s.platform = Gem::Platform::RUBY
-  s.extensions << 'ext/extconf.rb'
-  s.files = FILES.to_a
-  s.autorequire = 'cast'
-  s.test_file = 'test/run.rb'
-  s.has_rdoc = false
-
-  s.add_development_dependency 'racc'
-  s.requirements << 're2c'
-end
-
-Gem::PackageTask.new spec
-
 desc "Remove temporary files in build process"
 task :clean do
   rm_f 'ext/cast/*.o'
@@ -75,7 +51,7 @@ end
 desc "Remove all files built from initial source files"
 task :clobber => [:clean] do
   rm_f 'ext/cast/Makefile'
-  rm_f 'ext/cast/cast_ext.so'
+  rm_f Dir['ext/cast/*.{bundle,dll,o,so}']
   rm_f 'ext/cast/yylex.c'
   rm_f 'lib/cast/c.tab.rb'
   rm_f 'pkg'

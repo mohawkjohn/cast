@@ -3,9 +3,8 @@
 *.o
 *.so
 *.swp
+.*
 /doc
 /ext/cast/Makefile
-/ext/cast/yylex.c
-/lib/cast/c.tab.rb
 /pkg
 /tmp

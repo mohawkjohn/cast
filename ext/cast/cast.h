@@ -1,3 +1,5 @@
+#ifndef CAST_H
+#define CAST_H 1
 #include <assert.h>
 #include "ruby.h"
 
@@ -139,3 +141,4 @@ extern VALUE cast_sym_GT;
 extern VALUE cast_sym_XOR;
 extern VALUE cast_sym_OR;
 extern VALUE cast_sym_QUESTION;
+#endif

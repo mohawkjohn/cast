@@ -37,7 +37,8 @@ class PreprocessorTest < Test::Unit::TestCase
   def test_full_command
     original_command = C::Preprocessor.command
     C::Preprocessor.command = 'COMMAND'
-    assert_equal("COMMAND -P -Idir1 '-Idir 2' -DI=5 '-DS=\"blah\"' " <<
+    assert_equal("COMMAND -P -std=c99 -imacros stdarg.h " <<
+                   "-Idir1 '-Idir 2' -DI=5 '-DS=\"blah\"' " <<
                    "'-DSWAP(a,b)=a ^= b ^= a ^= b' -DV 'a file.c'",
                  cpp.full_command('a file.c'))
   ensure
@@ -68,9 +69,7 @@ EOS
     assert_match(/int three = 3;/, output)
   end
   def test_preprocess_no_line_markers
-    FileUtils.cd(TEST_DIR) do
-      output = cpp.preprocess("int one = 1;")
-    end
+    output = cpp.preprocess("int one = 1;")
     assert_no_match(/^#/, output)
   end
   def test_preprocess_file

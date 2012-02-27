@@ -2,13 +2,10 @@ require 'rbconfig'
 
 ##############################################################################
 #
-# A C preprocessor that wraps the command in RbConfig::CONFIG['CC'].
+# A C preprocessor that wraps the command in RbConfig::CONFIG['CPP'].
 #
 # Assumes a POSIX-style cpp command line interface, in particular, -I, -P, and
 # -D options.
-#
-# Note, LLVM clang that ships with OSX does not support the -P option. GCC
-# should be used instead.
 #
 ##############################################################################
 
@@ -20,7 +17,7 @@ module C
     class << self
       attr_accessor :command
     end
-    self.command = RbConfig::CONFIG['CC']
+    self.command = RbConfig::CONFIG['CPP']
 
     attr_accessor :pwd, :include_path, :macros
 
@@ -70,7 +67,7 @@ module C
         shellquote("-D#{key}" + (val ? "=#{val}" : ''))
       end.join(' ')
       filename = shellquote(filename)
-      "#{Preprocessor.command} -P #{include_args} #{macro_args} #{filename}"
+      "#{Preprocessor.command} -P -std=c99 -imacros stdarg.h #{include_args} #{macro_args} #{filename}"
     end
   end
 end

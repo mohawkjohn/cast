@@ -2,12 +2,12 @@
 
 task :default => :test
 
-require 'rubygems'
 require 'rake/testtask'
-require 'rubygems/package_task'
+
+dlext = RbConfig::CONFIG['DLEXT']
 
 # cast_ext
-file 'ext/cast/cast_ext.so' =>
+file "ext/cast/cast_ext.#{dlext}" =>
      FileList['ext/cast/*.c', 'ext/cast/yylex.c'] do |t|
   cd 'ext/cast' do
     ruby 'extconf.rb'
@@ -27,9 +27,8 @@ end
 
 desc "Build."
 task :lib =>
-  FileList['lib/cast/*.rb',
-           'lib/cast/c.tab.rb',
-           'ext/cast/cast_ext.so']
+  FileList['lib/cast/c.tab.rb',
+           "ext/cast/cast_ext.#{dlext}"]
 
 desc "Run unit tests."
 Rake::TestTask.new(:test => :lib) do |t|
@@ -54,6 +53,5 @@ task :clobber => [:clean] do
   rm_f Dir['ext/cast/*.{bundle,dll,o,so}']
   rm_f 'ext/cast/yylex.c'
   rm_f 'lib/cast/c.tab.rb'
-  rm_f 'pkg'
 end
 

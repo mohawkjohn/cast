@@ -473,8 +473,8 @@ module C
       return self
     end
     def <<(newnode)
-      newnode = *add_prep([newnode])
-      @array << newnode
+      newnode = add_prep([newnode])
+      @array << newnode.first
       added_(newnode)
       adjust_indices_(@array.length - 1)
       return self

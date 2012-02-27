@@ -230,11 +230,11 @@ module C
   ].each do |c, proc, space_needed|
     c.send(:define_method, :to_s) do | |
       if expr.to_s_precedence < self.to_s_precedence
-        return "#{instance_eval(&proc)}(#{expr})"
+        return "#{instance_exec(&proc)}(#{expr})"
       elsif space_needed && expr.class == self.class
-        return "#{instance_eval(&proc)} #{expr}"
+        return "#{instance_exec(&proc)} #{expr}"
       else
-        return "#{instance_eval(&proc)}#{expr}"
+        return "#{instance_exec(&proc)}#{expr}"
       end
     end
   end
@@ -247,9 +247,9 @@ module C
   ].each do |c, proc|
     c.send(:define_method, :to_s) do | |
       if expr.to_s_precedence < self.to_s_precedence
-        return "(#{expr})#{instance_eval(&proc)}"
+        return "(#{expr})#{instance_exec(&proc)}"
       else
-        return "#{expr}#{instance_eval(&proc)}"
+        return "#{expr}#{instance_exec(&proc)}"
       end
     end
   end
@@ -368,7 +368,7 @@ module C
       const?    and str << 'const '
       restrict? and str << 'restrict '
       volatile? and str << 'volatile '
-      str << instance_eval(&x) << (namestr ? " #{namestr}" : '')
+      str << instance_exec(&x) << (namestr ? " #{namestr}" : '')
     end
   end
 

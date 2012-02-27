@@ -394,27 +394,27 @@ module NodeListWalkTest
     check_iter(empty, [])
 
     # one
-    a = *one_els
-    check_iter(one, [a])
+    a = one_els
+    check_iter(one, a)
 
     # two
-    a, b = *two_els
+    a, b = two_els
     check_iter(two, [a, b])
 
     # three
-    a, b, c = *three_els
+    a, b, c = three_els
     check_iter(three, [a, b, c])
 
     # four
-    a, b, c, d = *four_els
+    a, b, c, d = four_els
     check_iter(four, [a, b, c, d])
 
     # two_by_four
-    l0, l1, l2, l3, a, b, c, d, e, f, g, h = *two_by_four_els
+    l0, l1, l2, l3, a, b, c, d, e, f, g, h = two_by_four_els
     check_iter(two_by_four, [l0, l1, l2, l3])
 
     # big
-    l1, l2, l21, l22, l23, l230, a, b, c, d, e = *big_els
+    l1, l2, l21, l22, l23, l230, a, b, c, d, e = big_els
     check_iter(big, [a, l1, l2])
   end
 
@@ -1212,37 +1212,37 @@ module NodeListArrayQueryTests
     assert_same_list([], r)
 
     # one
-    a = *one_els
+    a = one_els
     r = one.to_a
     assert_same(::Array, r.class)
-    assert_same_list([a], r)
+    assert_same_list(a, r)
 
     # two
-    a, b = *two_els
+    a, b = two_els
     r = two.to_a
     assert_same(::Array, r.class)
     assert_same_list([a, b], r)
 
     # three
-    a, b, c = *three_els
+    a, b, c = three_els
     r = three.to_a
     assert_same(::Array, r.class)
     assert_same_list([a, b, c], r)
 
     # four
-    a, b, c, d = *four_els
+    a, b, c, d = four_els
     r = four.to_a
     assert_same(::Array, r.class)
     assert_same_list([a, b, c, d], r)
 
     # two_by_four
-    l0, l1, l2, l3, a, b, c, d, e, f, g, h = *two_by_four_els
+    l0, l1, l2, l3, a, b, c, d, e, f, g, h = two_by_four_els
     r = two_by_four.to_a
     assert_same(::Array, r.class)
     assert_same_list([l0, l1, l2, l3], r)
 
     # big
-    l1, l2, l21, l22, l23, l230, a, b, c, d, e = *big_els
+    l1, l2, l21, l22, l23, l230, a, b, c, d, e = big_els
     r = big.to_a
     assert_same(::Array, r.class)
     assert_same_list([a, l1, l2], r)
@@ -1345,14 +1345,14 @@ module NodeListArrayQueryTests
     assert_same_list([nil], empty.values_at(-1))
 
     # one
-    a = *one_els
+    a = one_els.first
     assert_same_list([], one.values_at())
     assert_same_list([a], one.values_at(0))
     assert_same_list([a], one.values_at(-1))
     assert_same_list([nil, a], one.values_at(1, -1))
 
     # big -- [a, [b,c], [d, [e], [], [[]]]]
-    l1, l2, l21, l22, l23, l230, a, b, c, d, e = *big_els
+    l1, l2, l21, l22, l23, l230, a, b, c, d, e = big_els
     assert_same_list([], big.values_at())
     assert_same_list([l2], big.values_at(-1))
     assert_same_list([a, nil], big.values_at(-3, 3))
@@ -2306,7 +2306,7 @@ module NodeListModifierTests
   end
 
   def test_clear_two
-    a, b = *two_els
+    a, b = two_els
     assert_same(two, two.clear)
     assert_same_list([], two)
     assert_nil(a.parent)
@@ -2314,7 +2314,7 @@ module NodeListModifierTests
   end
 
   def test_clear_three
-    a, b, c = *three_els
+    a, b, c = three_els
     assert_same(three, three.clear)
     assert_same_list([], three)
     assert_nil(a.parent)
@@ -2323,7 +2323,7 @@ module NodeListModifierTests
   end
 
   def test_clear_big
-    l1, l2, l21, l22, l23, l230, a, b, c, d, e = *big_els
+    l1, l2, l21, l22, l23, l230, a, b, c, d, e = big_els
     assert_same(big, big.clear)
     assert_same_list([], big)
     assert_nil(a.parent)

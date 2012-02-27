@@ -7,6 +7,7 @@
 
 require 'delegate'
 require 'tmpdir'
+require 'thread'
 
 # A class for managing temporary files.  This library is written to be
 # thread safe.
@@ -29,25 +30,24 @@ module C
       end
 
       lock = nil
+      tmpname = nil
       n = failure = 0
-      
-      begin
-        Thread.critical = true
 
+      Thread.exclusive do
         begin
-          tmpname = File.join(tmpdir, make_tmpname(basename, n, suffix))
-          lock = tmpname + '.lock'
-          n += 1
-        end while @@cleanlist.include?(tmpname) or
+          begin
+            tmpname = File.join(tmpdir, make_tmpname(basename, n, suffix))
+            lock = tmpname + '.lock'
+            n += 1
+          end while @@cleanlist.include?(tmpname) or
           File.exist?(lock) or File.exist?(tmpname)
 
-        Dir.mkdir(lock)
-      rescue
-        failure += 1
-        retry if failure < MAX_TRY
-        raise "cannot generate tempfile `%s'" % tmpname
-      ensure
-        Thread.critical = false
+          Dir.mkdir(lock)
+        rescue
+          failure += 1
+          retry if failure < MAX_TRY
+          raise "cannot generate tempfile `%s'" % tmpname
+        end
       end
 
       @data = [tmpname]

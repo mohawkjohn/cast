@@ -33,6 +33,9 @@ module C
         file.puts text
       end
       output = `#{full_command(filename)} 2>&1`
+      # workaround clang anomalies
+      output.gsub!(/;\r?\n\s+struct <anonymous struct at.*>/, '')
+      output.gsub!(/\} union/, '}')
       if $? == 0
         return output
       else
@@ -67,7 +70,7 @@ module C
         shellquote("-D#{key}" + (val ? "=#{val}" : ''))
       end.join(' ')
       filename = shellquote(filename)
-      "#{Preprocessor.command} -P -std=c99 -imacros stdarg.h #{include_args} #{macro_args} #{filename}"
+      "clang -cc1 -ast-print #{include_args} #{macro_args} #{filename}"
     end
   end
 end

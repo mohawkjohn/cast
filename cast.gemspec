@@ -16,11 +16,11 @@ spec = Gem::Specification.new do |s|
   s.requirements << 're2c for development'
   s.requirements << 'a precompiler such as GCC'
   s.post_install_message =<<MSG
-*********************************************************
-Make sure you have the C compiler for your Ruby.
-To find what the C compiler for your Ruby is:
+****************************************************
+Make sure you have the C preprocessor for your Ruby.
+To find the C preprocessor command for your Ruby:
 
-ruby -e "require 'rbconfig'; puts RbConfig::CONFIG['CPP']"
-*********************************************************
+ruby -rrbconfig -e "puts RbConfig::CONFIG['CPP']"
+****************************************************
 MSG
 end

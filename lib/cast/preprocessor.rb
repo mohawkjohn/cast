@@ -1,23 +1,21 @@
-require 'rbconfig'
+require 'open3'
 
 ##############################################################################
 #
-# A wrapper around the C preprocessor in RbConfig::CONFIG['CPP'].
-#
-# Assumes a POSIX-style cpp command line interface, in particular, -I, -P, and
-# -D options.
+# A wrapper around the clang
 #
 ##############################################################################
 
 module C
   class Preprocessor
+    INCLUDE_REGEX = /(?:[^ ]|\\ )+\.h/i
+
     class Error < StandardError
     end
 
     class << self
       attr_accessor :command
     end
-    self.command = RbConfig::CONFIG['CPP']
 
     attr_accessor :pwd, :include_path, :macros
 
@@ -26,51 +24,47 @@ module C
       @macros = {}
     end
     def preprocess(text)
-      filename = nil
-      Tempfile.open('cast-preprocessor-input.',
-                    File.expand_path(pwd || '.'), '.c') do |file|
-        filename = file.path
-        file.puts text
-      end
-      output = `#{full_command(filename)} 2>&1`
-      # workaround clang anomalies
-      output.gsub!(/;\r?\n\s+struct <anonymous struct at.*>/, '')
-      output.gsub!(/\} union/, '}')
-      if $? == 0
-        return output
-      else
-        raise Error, output
-      end
+      args = %w{clang -cc1 -ast-print}
+      run args, text
+    end
+    def get_all_includes(text)
+      args = %w{clang -E -M}
+      split_includes run(args, text)
+    end
+    def get_system_includes(text)
+      get_all_includes(text) - get_project_includes(text)
+    end
+    def get_project_includes(text)
+      args = %w{clang -E -MM}
+      split_includes run(args, text)
     end
     def preprocess_file(file_name)
-      file_name = File.expand_path(file_name)
-      dir = File.dirname(file_name)
-      FileUtils.cd(dir) do
-        return preprocess(File.read(file_name))
-      end
+      preprocess(File.read(file_name))
     end
 
     private  # -------------------------------------------------------
 
-    def shellquote(arg)
-      if arg !~ /[\"\'\\$&<>|\s]/
-        return arg
-      elsif arg !~ /\'/
-        return "'#{arg}'"
-      else
-        arg.gsub!(/([\"\\$&<>|])/, '\\\\\\1')
-        return "\"#{arg}\""
+    def run(args, input)
+      options = {:stdin_data => clang_macro_defines + input}
+      options[:chdir] = pwd if pwd
+      output, error, result = Open3.capture3(*args, *include_args, '-', options)
+      raise Error, error unless result.success?
+      output
+    end
+    def include_args
+      include_path.map do |path|
+        "-I#{path}"
       end
     end
-    def full_command(filename)
-      include_args = include_path.map do |path|
-        "#{shellquote('-I'+path)}"
-      end.join(' ')
-      macro_args   = macros.sort.map do |key, val|
-        shellquote("-D#{key}" + (val ? "=#{val}" : ''))
-      end.join(' ')
-      filename = shellquote(filename)
-      "clang -cc1 -ast-print #{include_args} #{macro_args} #{filename}"
+    # must inject #define macros into the text instead of using the -D argument
+    # since clang doesn't preprocess macros provided by -D in -ast-print
+    def clang_macro_defines
+      macros.map do |key, val|
+        "#define #{key} #{val.nil? ? 1 : val}\n"
+      end.join
+    end
+    def split_includes(text)
+      text.scan(INCLUDE_REGEX)
     end
   end
 end

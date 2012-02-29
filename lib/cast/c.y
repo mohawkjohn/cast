@@ -572,7 +572,7 @@ restrict return short signed sizeof static struct switch typedef union
   @@keywords = %r"#{keywords.join('|')}"
 
   def initialize
-    @type_names = ::Set.new
+    @type_names = ::Set.new %w{__builtin_va_list}
 
     @warning_proc = lambda{}
     @pos          = C::Node::Pos.new(nil, 1, 0)

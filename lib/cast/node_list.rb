@@ -56,7 +56,7 @@ module C
     end
 
     def inspect
-      "#{self.class}[#{self.join(', ')}]"
+      "#{self.class}[#{self.map(&:inspect).join(', ')}]"
     end
 
     protected  # -----------------------------------------------------

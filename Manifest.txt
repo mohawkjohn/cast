@@ -15,7 +15,7 @@ lib/cast/tempfile.rb
 lib/cast/to_s.rb
 lib/cast.rb
 ext/cast/cast.h
-ext/cast/cast_ext.c
+ext/cast/cast.c
 ext/cast/extconf.rb
 ext/cast/parser.c
 ext/cast/yylex.c

@@ -10,5 +10,5 @@ require "cast/to_s"
 require "cast/inspect"
 
 module C
-  VERSION = "0.1.2"
+  VERSION = "0.2.2"
 end

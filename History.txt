@@ -1,4 +1,4 @@
-=== 2012-04-24
+=== 0.2.2 / 2012-04-24
 
   * Switched to Hoe
 
@@ -15,7 +15,7 @@
   * Update for Ruby 1.9
   * For complete changes, see: https://github.com/drbrain/cast/commits/
 
-=== 2007-01-21
+=== 0.2.0 / 2007-01-21
 
 	* test/test_render.rb: Born.  (Tests for #to_s, which will be
 	shortly renamed #render.)

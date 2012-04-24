@@ -1,3 +1,3 @@
 require 'mkmf'
 
-create_makefile 'cast'
+create_makefile 'cast/cast'

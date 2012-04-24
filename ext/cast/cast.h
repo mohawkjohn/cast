@@ -1,7 +1,7 @@
 #ifndef CAST_H
 #define CAST_H 1
 #include <assert.h>
-#include "ruby.h"
+#include <ruby.h>
 
 /* Modules and classes.
  */

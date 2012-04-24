@@ -1,4 +1,21 @@
-2007-01-21  George Ogata  <george.ogata@gmail.com>
+=== 2012-04-24
+
+  * Switched to Hoe
+
+=== 2012-03-02
+
+  * Added gemspec
+  * Preprocessor handling
+  * Support for Ruby 1.9.3
+  * For complete changes, see: https://github.com/dlee/cast/commits/
+
+=== 2011-01-10
+
+  * Placed on Github by drbrain
+  * Update for Ruby 1.9
+  * For complete changes, see: https://github.com/drbrain/cast/commits/
+
+=== 2007-01-21
 
 	* test/test_render.rb: Born.  (Tests for #to_s, which will be
 	shortly renamed #render.)
@@ -23,18 +40,18 @@
 	(Expression.parse): Support CompoundLiterals without types (as
 	allowed in declarators only).
 
-2007-01-20  George Ogata  <george.ogata@gmail.com>
+=== 2007-01-20
 
 	* lib/cast/parse.rb (Declarator.parse): Allow specification
 	of #num_bits.
 
-2006-05-07  George Ogata  <george.ogata@gmail.com>
+=== 2006-05-07
 
 	* lib/cast/preprocessor.rb: Added C::Preprocessor, a preprocessor
 	  that wraps around the command in Config::CONFIG['CPP'].  Assumes
 	  POSIX-style -D and -I options.
 
-2006-05-06  George Ogata  <george.ogata@gmail.com>
+=== 2006-05-06
 
 	* lib/cast/c_nodes.rb: Added fields:
 		+ CharLiteral#prefix
@@ -53,9 +70,7 @@
 
 	* lib/cast/c.y (on_error): Made parse error message more meaningful.
 
-2006-04-26  George Ogata  <george.ogata@gmail.com>
-
-	* Release 0.1.0.
+=== 0.1.0 / 2006-04-26
 
 	* Rejigged gemspec to compile new lexer on installation.
 
@@ -64,7 +79,7 @@
 
 	* Merged install.rb into Rakefile.
 
-2005-07-17  George Ogata  <george.ogata@gmail.com>
+=== 2005-07-17
 
 	* src/parser.c: Born.
 
@@ -78,7 +93,7 @@
 
 	* test/*: merged common.rb into run.rb.
 
-2005-07-10  George Ogata  <george.ogata@gmail.com>
+=== 2005-07-10
 
 	* lib/c_nodes.rb: Added fields:
 		+ StringLiteral#wide?
@@ -87,28 +102,28 @@
 		+ FloatLiteral#format
 		+ FloatLiteral#suffix
 
-2005-03-14  George Ogata  <george.ogata@gmail.com>
+=== 2005-03-14
 
 	* lib/c.y: Allow type names in Call#args.  (Not C99, but useful
 	  for macros.)
 
-2005-03-07  George Ogata  <george.ogata@gmail.com>
+=== 2005-03-07
 
 	* lib/to_s.rb (CompoundLiteral#to_s): Made it work.
 
-2005-02-26  George Ogata  <george.ogata@gmail.com>
+=== 2005-02-26
 
 	* lib/to_s.rb (AssignmentExpression#to_s): Fixed for when #lval
 	  is a Comma.
 
-2005-02-23  George Ogata  <george.ogata@gmail.com>
+=== 2005-02-23
 
 	* lib/inspect.rb: Renamed Node#to_debug to Node#inspect.
 	  Renamed to_debug.rb to inspect.rb.
 
 	* lib/to_s.rb (Parameter#to_s): Fixed for when #type is nil.
 
-2005-02-19  George Ogata  <george.ogata@gmail.com>
+=== 0.0.1 / 2005-02-19
 
 	* Hello, world!
 

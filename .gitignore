@@ -5,6 +5,5 @@
 *.swp
 .*
 /doc
-/ext/cast/Makefile
 /pkg
 /tmp

@@ -1,19 +1,34 @@
 # -*- mode: ruby -*-
 
+require 'rubygems'
+
+# Fix for problem described here: https://github.com/jbarnette/isolate/pull/39
+module Gem
+  Deprecate = Module.new do
+    include Deprecate
+  end
+end
+require 'isolate/now'
+
+
+require 'hoe'
+
+Hoe.plugin :compiler
+Hoe.plugin :bundler
+Hoe.plugin :git
+
+h = Hoe.spec 'cast' do
+  self.require_ruby_version ">=1.9"
+  self.developer('George Ogata', 'george.ogata@gmail.com')
+  self.readme_file = 'README.rdoc'
+end
+
 task :default => :test
 
 require 'rake/testtask'
 
 dlext = RbConfig::CONFIG['DLEXT']
 
-# cast_ext
-file "ext/cast/cast_ext.#{dlext}" =>
-     FileList['ext/cast/*.c', 'ext/cast/yylex.c'] do |t|
-  cd 'ext/cast' do
-    ruby 'extconf.rb'
-    sh 'make'
-  end
-end
 
 # lexer
 file 'ext/cast/yylex.c' => 'ext/cast/yylex.re' do |t|
@@ -25,11 +40,6 @@ file 'lib/cast/c.tab.rb' => 'lib/cast/c.y' do |t|
   sh "racc #{t.prerequisites[0]}"
 end
 
-desc "Build."
-task :lib =>
-  FileList['lib/cast/c.tab.rb',
-           "ext/cast/cast_ext.#{dlext}"]
-
 desc "Run unit tests."
 Rake::TestTask.new(:test => :lib) do |t|
   t.libs << 'ext' << 'test'
@@ -38,20 +48,8 @@ Rake::TestTask.new(:test => :lib) do |t|
 end
 
 desc "Run irb with cast loaded."
-task :irb => :lib do
+task :irb => :compile do
   sh 'irb -Ilib:ext -rcast'
 end
 
-desc "Remove temporary files in build process"
-task :clean do
-  rm_f 'ext/cast/*.o'
-end
-
-desc "Remove all files built from initial source files"
-task :clobber => [:clean] do
-  rm_f 'ext/cast/Makefile'
-  rm_f Dir['ext/cast/*.{bundle,dll,o,so}']
-  rm_f 'ext/cast/yylex.c'
-  rm_f 'lib/cast/c.tab.rb'
-end
 

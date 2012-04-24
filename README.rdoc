@@ -1,212 +1,60 @@
-<!-- OMG, a ruby page with hardly any red on it! -->
-<html>
-<head>
-  <title>CAST -- Ruby's C parsing dog.  Woof.</title>
-</head>
-<body>
-<style>
-  body {
-  }
-  ul { 
-      line-height: 1.5em;
-      list-style-type: square;
-      margin: 0.3em 0 0 1.5em;
-      padding:0;
-      list-style-image: url("bullet.gif");
-  }
-  li { margin-bottom: 0.1em; }
-  li.node_classes {
-    color: #447744;
-  }
-  span.node_classes_abstract {
-    color: #447744;
-    font-weight: bolder;
-  }
-  span.node_classes_concrete {
-    color: #447744;
-  }
-  tt {
-  }
-  h1 {
-    color: #447744;
-    text-align: center;
-  }
-  h2 {
-    color: #447744;
-    border-bottom-style: solid;
-    border-bottom-width: 1;
-    border-bottom-color: #447744;
-  }
-  h3 {
-    color: #447744;
-  }
-  pre.code_snippet {
-    line-height: 1.2;
-    border-style: solid;
-    border-color: #000000;
-    border-width: 2;
-    padding: 4;
-    background-color: #ffffcc;
-  }
-  span.code_comment {
-    color: #447744;
-    font-style: oblique;
-  }
-  span.code_highlight {
-    color: #ff0000;
-  }
-  div.node_classes {
-    border-style: solid;
-    border-color: #000000;
-    border-width: 2;
-    background-color: #ffffcc;
-    color: #447744;
-  }
-  table.node_desc {
-    border-style: solid;
-    border-color: #000000;
-    border-width: 2;
-  }
-  thead {
-    font-weight: bolder;
-  }
-  tr.node_desc_header {
-  }
-  tr.node_desc_oddrow {
-    background-color: #ddffdd;
-  }
-  tr.node_desc_evenrow {
-    background-color: #ffffcc;
-  }
-  a.links {
-    color: #885500;
-  }
-  td.links {
-    padding: 5;
-    background-color: #bbddff;
-    vertical-align: top;
-    border-right-style: solid;
-    border-color: #000000;
-    border-width: 5;
-    color: #ffffff;
-  }
-  td.nd_class {
-    vertical-align: center;
-  }
-  td.nd_field {
-    vertical-align: top;
-  }
-  td.nd_child {
-    vertical-align: top;
-    text-align: center;
-  }
-  td.nd_values {
-    vertical-align: top;
-  }
-  td.nd_default {
-    vertical-align: top;
-  }
-  td.nd_comments {
-    vertical-align: top;
-  }
-</style>
+= CAST
 
-<table><tr><td class="links">  <!-- frame table -->
+http://cast.rubyforge.org
 
-<ul>
-  <li><a class="links" href="http://rubyforge.org/projects/cast/">RubyForge</a></li>
-  <li><a class="links" href="http://rubyforge.org/frs/?group_id=561">Download</a></li>
-</ul>
+== Description
 
-</td><td>  <!-- frame table -->
+CAST parses C code into an abstract syntax tree (AST), lets you break it, then vomit it out as code. The parser does C99.
 
-<h1>CAST</h1>
+This fork supports Ruby 1.9.3, gemspec, and requires Hoe. The Rubyforge page above is documentation for the original version, but most things should be the same.
 
-<h2>What Is</h2>
-<p>
-  CAST parses C code into an abstract syntax tree (AST), lets you
-  break it, then vomit it out as code.  The parser does C99.
-</p>
+== Library Overview
 
-<h2>Library Overview</h2>
+Everything is in the module <tt>C</tt>.
 
-<p>Everything is in the module <tt>C</tt>.</p>
-<ul>
-  <li>There's the parser (<tt>Parser</tt>).</li>
-  <li>There's the tree (<tt>Node</tt> and its subclasses).</li>
-  <li>That's it.</li>
-</ul>
+* There's the parser (<tt>Parser</tt>).
+* There's the tree (<tt>Node</tt> and its subclasses).
+* That's it.
 
-<h3>Usage</h3>
+=== Usage
 
-<p>
-  You call <tt>Parser#parse</tt>, and it gives you a tree of
-  <tt>Node</tt> objects.  Watch:
-</p>
+You call <tt>Parser#parse</tt>, and it gives you a tree of <tt>Node</tt> objects. Watch:
 
-<pre class="code_snippet">
-require 'cast/cast'
+    require 'cast/cast'
 
-<span class="code_comment"># create a parser</span>
-parser = C::Parser.new
+    # create a parser
+    parser = C::Parser.new
 
-<span class="code_comment"># (optional) set some settings...</span>
-parser.pos.filename = "toy.c"      <span class="code_comment"># used for error messages</span>
-parser.type_names << 'LinkedList'  <span class="code_comment"># treat these words as types</span>
+    # (optional) set some settings...
+    parser.pos.filename = "toy.c"      # used for error messages
+    parser.type_names << 'LinkedList'  # treat these words as types
 
-<span class="code_comment"># gimme a tree</span>
-ugly_c_code = File.read("toy.c")
-tree = parser.parse(ugly_c_code)
+    # gimme a tree
+    ugly_c_code = open("toy.c"){|f| f.read}
+    tree = parser.parse(ugly_c_code)
 
-<span class="code_comment"># what's the tree look like?</span>
-p tree
-</pre>
+    # what's the tree look like?
+    p tree
 
-<p>
-  If there's a parse error, <tt>#parse</tt> raises a
-  <tt>ParseError</tt> (which has a nice error message in
-  <tt>#message</tt>).
-</p>
+If there's a parse error, <tt>#parse</tt> raises a <tt>ParseError</tt> (which has a nice error message in <tt>#message</tt>).
 
-<a name="the_parser"></a><h2>The Parser</h2>
+== The Parser
 
-<p>
-  Here's a quiz:  what does "<tt>a * b;</tt>" do?
-</p>
-<p>
-  I bet you said "why you l4m3r n00b, that's a statement that
-  multiplies <tt>a</tt> by <tt>b</tt> and throws away the answer --
-  now go take your meaningless snippetage to your computing 101 class
-  and let me finish hurting this Java<sup>TM</sup> programmer."  Well,
-  you'd be both mean and wrong.  It was, of course, a trick question.
-  I didn't say if any of <tt>a</tt> and <tt>b</tt> are types!  If only
-  <tt>a</tt> is a type, it's actually a declaration.  And if
-  <tt>b</tt> is a type, it's a syntax error.
-</p>
-<p>
-  So, the parser's gonna need to know which identifiers are type
-  names.  This is one of the bits of state that a <tt>Parser</tt>
-  keeps.  Here's the complete list (um, of two):
-</p>
-<ul>
-  <li>
-    <tt>#type_names</tt> -- a <tt>Set</tt> of <tt>String</tt>s.
-  </li>
-  <li>
-    <tt>#pos</tt> -- the <tt>Node::Pos</tt> this parser will start
-    parsing at.
-  </li>
-</ul>
+Here's a quiz: what does <tt>"a * b;"</tt> do?
 
-<p>
-  A <tt>Node::Pos</tt> has three read-write atts: <tt>#filename</tt>,
-  <tt>#line_num</tt>, <tt>#col_num</tt>.  Default is <tt>nil</tt>, 1,
-  0.
-</p>
+I bet you said "why you l4m3r n00b, that's a statement that multiplies <tt>a</tt> by <tt>b</tt> and throws away the answer -- now go take your meaningless snippetage to your computing 101 class and let me finish hurting this Java<sup>TM</sup> programmer." Well, you'd be both mean and wrong. It was, of course, a trick question. I didn't say if any of <tt>a</tt> and <tt>b</tt> are types! If only <tt>a</tt> is a type, it's actually a declaration. And if <tt>b</tt> is a type, it's a syntax error.
 
-<a name="the_nodes"></a><h2>The Nodes</h2>
+So, the parser's gonna need to know which identifiers are type names. This is one of the bits of state that a <tt>Parser</tt> keeps. Here's the complete list (um, of two):
 
-<p>There are a couple of Node classes:</p>
+* <tt>#type_names</tt> -- a <tt>Set</tt> of <tt>String</tt>s.
+* <tt>#pos</tt> -- the <tt>Node::Pos</tt> this parser will start parsing at.
+
+A <tt>Node::Pos</tt> has three read-write atts: <tt>#filename</tt>, <tt>#line_num</tt>, <tt>#col_num</tt>. Default is <tt>nil</tt>, 1, 0.
+
+== The Nodes
+
+There are a couple of <tt>Node</tt> classes:
+
 
 <div class="node_classes"><table><tr>
   <td>
@@ -359,253 +207,126 @@ p tree
   </td></tr>
 </table></div>
 
-<p>
-  The <b>bold</b> ones are abstract.
-</p>
-<p>
-  The last 2 (the <tt>NodeList</tt>s) represent lists of nodes.
-  Methodwise, they try to behave like normal ruby <tt>::Array</tt>s.
-  Implementationwise, a <tt>NodeChain</tt> is a doubly linked list,
-  whereas a <tt>NodeArray</tt> is an array.  <tt>NodeChain</tt>s may
-  be more efficient when adding things at the beginning of a LARGE
-  list.
-</p>
+The <b>bold</b> ones are abstract.
 
-<h3>Attributes</h3>
+The last 2 (the <tt>NodeList</tt>s) represent lists of nodes. Methodwise, they try to behave like normal ruby <tt>::Array</tt>s. Implementationwise, a <tt>NodeChain</tt> is a doubly linked list, whereas a <tt>NodeArray</tt> is an array. <tt>NodeChain</tt>s may be more efficient when adding things at the beginning of a LARGE list.
 
-<p>Each <tt>Node</tt> object has:</p>
+=== Attributes
 
-<ul>
-  <li>
-    <tt>#parent</tt> -- return the parent in the tree (a <tt>Node</tt>
-    or <tt>nil</tt>).
-  </li>
-  <li>
-    <tt>#pos</tt>, <tt>#pos=</tt> -- the position in the source file
-    (a <tt>Node::Pos</tt>).
-  </li>
-  <li>
-    <tt>#to_s</tt> -- return the code for the tree (a
-    <tt>String</tt>).
-  </li>
-  <li>
-    <tt>#inspect</tt> -- return a pretty string for inspection.
-    <b>Try it</b>.
-  </li>
-  <li>
-    <tt>#match?(str)</tt>, <tt>#=~(str)</tt> -- return true iff
-    <tt>str</tt> parses as a <tt>Node</tt> equal to this one.
-  </li>
-  <li>
-    <tt>#detach</tt> -- remove this node from the tree (parent becomes
-    nil) and return it.
-  </li>
-  <li>
-    <tt>#detached?</tt>, <tt>#attached?</tt> -- return true if parent
-    is nil or non-nil respectively.
-  </li>
-  <li>
-    <tt>#replace_with(node)</tt> -- replace this node with
-    <tt>node</tt> in the tree.
-  </li>
-  <li>
-    <tt>#swap_with(node)</tt> -- exchange this node with <tt>node</tt>
-    in their trees.
-  </li>
-  <li>
-    <tt>#insert_prev(*<tt>nodes</tt>)</tt>,
-    <tt>#insert_next(*nodes)</tt> -- insert <tt>nodes</tt> before this
-    node in the parent list.  Parent must be a <tt>NodeList</tt>!
-    Useful for adding statements before a node in a block, for
-    example.
-  </li>
-  <li>
-    <tt>#<i>Foo</i>?</tt> -- (where <tt><i>Foo</i></tt> is a module
-    name) return <tt>self.is_a?(<em>Foo</em>)</tt>.
-  </li>
-</ul>
+Each <tt>Node</tt> object has:
 
-<!--<p>
+* <tt>#parent</tt> -- return the parent in the tree (a <tt>Node</tt> or <tt>nil</tt>).
+* <tt>#pos</tt>, <tt>#pos=</tt> -- the position in the source file (a <tt>Node::Pos</tt>).
+* <tt>#to_s</tt> -- return the code for the tree (a <tt>String</tt>).
+* <tt>#inspect</tt> -- return a pretty string for inspection. <b>Try it</b>.
+* <tt>#match?(str)</tt>, <tt>#=~(str)</tt> -- return true iff <tt>str</tt> parses as a <tt>Node</tt> equal to this one.
+* <tt>#detach</tt> -- remove this node from the tree (parent becomes nil) and return it.
+* <tt>#detached?</tt>, <tt>#attached?</tt> -- return true if parent is nil or non-nil respectively.
+* <tt>#replace_with(node)</tt> -- replace this node with <tt>node</tt> in the tree.
+* <tt>#swap_with(node)</tt> -- exchange this node with <tt>node</tt> in their trees.
+* <tt>#insert_prev(*<tt>nodes</tt>)</tt>, <tt>#insert_next(*nodes)</tt> -- insert <tt>nodes</tt> before this node in the parent list. Parent must be a <tt>NodeList</tt>! Useful for adding statements before a node in a block, for example.
+* <tt>#<i>Foo</i>?</tt> -- (where <tt><i>Foo</i></tt> is a module name) return <tt>self.is_a?(<em>Foo</em>)</tt>.
+
+<!--
   Now the <tt>Foo?</tt> method above probably gave all the duck typing
   purists heart attacks, so I should prepare my defence.  CAST pays
   close attention to the classes of <tt>Node</tt>s.  That means if you
   dress up a <tt>Thingy</tt> as a <tt>FunctionDef</tt> and smuggle it
   into the tree, don't expect the pacemaker you're using this for to
   function correctly.  Basic methods like <tt>Node#==</tt> check that
-  the classes match.  
-</p>-->
+  the classes match.
+-->
 
-<p>
-  The <tt>#<i>Foo</i>?</tt> method is a convienience for a common
-  need.  Example:
-</p>
-<pre class="code_snippet">
-<span class="code_comment"># make a tree</span>
-ast = C::Parser.new.parse(code_string)
+The <tt>#<i>Foo</i>?</tt> method is a convienience for a common need.  Example:
 
-<span class="code_comment"># print all global variables</span>
-ast.entities.each do |node|
-  node.<span class="code_highlight">Declaration?</span> or next
-  node.declarators.each do |decl|
-    unless decl.type.<span class="code_highlight">Function?</span>
-      puts "#{decl.name}: #{decl.type}"
+    ## make a tree
+    ast = C::Parser.new.parse(code_string)
+
+    ## print all global variables
+    ast.entities.each do |node|
+      node.Declaration? or next
+      node.declarators.each do |decl|
+        unless decl.type.Function?
+          puts "#{decl.name}: #{decl.type}"
+        end
+      end
     end
-  end
-end
-</pre>
 
-<p>
-  If you're a duck-typing purist, then sorry for the cardiac arrest
-  you're now experiencing.  CAST <b>does</b> pay attention to the
-  class of <tt>Node</tt> objects for quite a few things.  This is the
-  cleanest way to distinguish, e.g., an <tt>Add</tt> from a
-  <tt>Subtract</tt> (which both have the same methods but represent
-  very different things).  It just seems impractical (and unnecessary)
-  to allow duck typing in this situation.
-</p>
+If you're a duck-typing purist, then sorry for the cardiac arrest
+you're now experiencing.  CAST *does* pay attention to the
+class of <tt>Node</tt> objects for quite a few things.  This is the
+cleanest way to distinguish, e.g., an <tt>Add</tt> from a
+<tt>Subtract</tt> (which both have the same methods but represent
+very different things).  It just seems impractical (and unnecessary)
+to allow duck typing in this situation.
 
-<p>
-  The <tt>#=~</tt> method lets you do:
-</p>
+The <tt>#=~</tt> method lets you do:
 
-<pre class="code_snippet">
-if declarator.type <span class="code_highlight">=~</span> 'const int *'
-  puts "Ooh, a const int pointer!"
-end
-</pre>
+    if declarator.type =~ 'const int *'
+      puts "Ooh, a const int pointer!"
+    end
 
-<p>
-  This is <b>not</b> the same as "<tt>declarator.type.to_s == 'const
-  int *'</tt>"; that'd require you to guess how to_s formats its
-  strings (most notably, the whitespace).
-</p>
+This is *not* the same as
 
-<h3>Fields and children</h3>
+    declarator.type.to_s == 'const int *'
 
-<p>
-  Each concrete <tt>Node</tt> class has a member for each bit of
-  important C stuff it pertains to.  I know you peeked at the big list
-  below, so you know the kind of thing I mean.
-</p>
+That'd require you to guess how to_s formats its strings (most notably, the whitespace).
 
-<p>
-  But these aren't defined as <tt>attr</tt>s as you normally do in
-  Ruby -- they're <strong>field</strong>s.  If a node has a field
-  <tt>foo</tt>, it means there's a setter <tt>#foo=</tt> and getter
-  <tt>#foo</tt>.  (A field <tt>foo?</tt> means the setter is
-  <tt>#foo=</tt> and the getter is <tt>#foo?</tt>.)  Some fields are
-  even more special: <strong>child</strong> fields.  These form the
-  tree structure, and always have a <tt>Node</tt> or <tt>nil</tt>
-  value.
-</p>
+=== Fields and children
 
-<p>
-  Why divulge these bizarre internal secrets?  Because these
-  <tt>Node</tt> methods are defined in terms of fields and children:
-</p>
-<ul>
-  <li>
-    <tt>#==</tt>, <tt>#eql?</tt> -- Equality is checked recursively.
-    That is, all fields (including children) must be equal.
-  </li>
-  <li>
-    <tt>#dup</tt>, <tt>#clone</tt> -- Children are copied recursively
-    (other fields and attrs as normal).
-  </li>
-</ul>
+Each concrete <tt>Node</tt> class has a member for each bit of
+important C stuff it pertains to.  I know you peeked at the big list
+below, so you know the kind of thing I mean.
 
-<p>
-  Then there's the tree-twiddling methods, which only ever
-  yield/return/affect (non-nil) children.
-</p>
-<ul>
-  <li>
-    <tt>#next, #prev </tt> -- return the next/prev sibling.
-  </li>
-  <li>
-    <tt>#list_next</tt>, <tt>#list_prev </tt> -- like
-    <tt>#next</tt>/<tt>#prev</tt>, but also requires the parent to be
-    <tt>NodeList</tt>.  I'll be honest; I don't remember why I added
-    these methods.  They may well suddenly disappear.
-  </li>
-  <li>
-    <tt>#each</tt>, <tt>#reverse_each</tt> -- Yield all (non-nil)
-    children.  Node includes <tt>Enumerable</tt>, so you get the free
-    chocolates too.
-  </li>
-  <li>
-    <tt>#depth_first</tt>, <tt>#reverse_depth_first </tt> -- Walk the
-    tree in that order, yielding two args (<tt>event, node</tt>) at
-    each node.  <tt>event</tt> is <tt>:down</tt> on the way down,
-    <tt>:up</tt> on the way up.  If the block <tt>throw</tt>s
-    <tt>:prune</tt>, it won't descend any further.
-  </li>
-  <li>
-    <tt>#preorder</tt>, <tt>#reverse_preorder</tt>,
-    <tt>#postorder</tt>, <tt>#reverse_postorder</tt> -- Walk the tree
-    depth first, yielding nodes in the given order.  For the
-    preorders, if the block throws <tt>:prune</tt>, it won't descend
-    any further.
-  </li>
-  <li>
-    <tt>#node_after(child)</tt>, <tt>#node_before(child) </tt> --
-    return the node before/after <tt>child</tt> (same as
-    <tt>child.next</tt>).
-  </li>
-  <li>
-    <tt>#remove_node(child)</tt> -- remove <tt>child</tt> from this
-    node (same as <tt>child.detach</tt>).
-  </li>
-  <li>
-    <tt>#replace_node(child, new_child) </tt> -- replace
-    <tt>child</tt> with yeah you guessed it (same as
-    <tt>child.replace_with(newchild)</tt>).
-  </li>
-</ul>
+But these aren't defined as <tt>attr</tt>s as you normally do in
+Ruby -- they're <strong>field</strong>s.  If a node has a field
+<tt>foo</tt>, it means there's a setter <tt>#foo=</tt> and getter
+<tt>#foo</tt>.  (A field <tt>foo?</tt> means the setter is
+<tt>#foo=</tt> and the getter is <tt>#foo?</tt>.)  Some fields are
+even more special: <strong>child</strong> fields.  These form the
+tree structure, and always have a <tt>Node</tt> or <tt>nil</tt>
+value.
 
-<p>
-  If you're walking the tree looking for nodes to move around, don't
-  forget that modifying the tree during traversal is a criminal
-  offence.
-</p>
+Why divulge these bizarre internal secrets?  Because these
+<tt>Node</tt> methods are defined in terms of fields and children:
 
-<p>
-  And now, the episode you've been waiting for: THE FIELD LIST!  (Cue
-  music and dim lights.)
-</p>
+* <tt>#==</tt>, <tt>#eql?</tt> -- Equality is checked recursively. That is, all fields (including children) must be equal.
+* <tt>#dup</tt>, <tt>#clone</tt> -- Children are copied recursively (other fields and attrs as normal).
 
-<p>Notes about the table:
-  <ul>
-    <li>
-      If no default is listed, it is <tt>false</tt> if the field name
-      ends in a '?', <tt>nil</tt> otherwise.
-    </li>
-    <li>
-      <tt>nil</tt> is <b>always</b> allowed for a child field.
-    </li>
-    <li>
-      There are some conventions we follow religiously to help you:
-      <ul>
-        <li>
-          Field names that end in '?' are <b>always</b> true-or-false.
-        </li>
-        <li>
-          <tt>NodeList</tt>-valued fields <b>always</b> default to an
-          empty <tt>NodeArray</tt> or <tt>NodeChain</tt>, so you can
-          tack things on there with <tt>&lt;&lt;</tt>, without worrying
-          about needing to create the list first.
-        </li>
-        <li>
-          A field is <tt>Node</tt>-valued <b>if and only if</b> it is
-          a child field.
-        </li>
-        <li>
-           The rows go yellow, green, yellow, green, ... .
-        </li>
-      </ul>
-    </li>
-  </ul>
-</p>
+Then there's the tree-twiddling methods, which only ever
+yield/return/affect (non-nil) children.
+
+* <tt>#next, #prev </tt> -- return the next/prev sibling.
+* <tt>#list_next</tt>, <tt>#list_prev </tt> -- like <tt>#next</tt>/<tt>#prev</tt>, but also requires the parent to be <tt>NodeList</tt>.  I'll be honest; I don't remember why I added these methods.  They may well suddenly disappear.
+* <tt>#each</tt>, <tt>#reverse_each</tt> -- Yield all (non-nil) children. Node includes <tt>Enumerable</tt>, so you get the free chocolates too.
+* <tt>#depth_first</tt>, <tt>#reverse_depth_first </tt> -- Walk the tree in that order, yielding two args (<tt>event, node</tt>) at each node.  <tt>event</tt> is <tt>:down</tt> on the way down, <tt>:up</tt> on the way up.  If the block <tt>throw</tt>s <tt>:prune</tt>, it won't descend any further.
+* <tt>#preorder</tt>, <tt>#reverse_preorder</tt>, <tt>#postorder</tt>, <tt>#reverse_postorder</tt> -- Walk the tree depth first, yielding nodes in the given order.  For the preorders, if the block throws <tt>:prune</tt>, it won't descend any further.
+* <tt>#node_after(child)</tt>, <tt>#node_before(child) </tt> -- return the node before/after <tt>child</tt> (same as <tt>child.next</tt>).
+* <tt>#remove_node(child)</tt> -- remove <tt>child</tt> from this node (same as <tt>child.detach</tt>).
+* <tt>#replace_node(child, new_child) </tt> -- replace <tt>child</tt> with yeah you guessed it (same as <tt>child.replace_with(newchild)</tt>).
+
+If you're walking the tree looking for nodes to move around, don't
+forget that modifying the tree during traversal is a criminal
+offence.
+
+And now, the episode you've been waiting for: THE FIELD LIST! (Cue
+music and dim lights.)
+
+Notes about the table:
+
+* If no default is listed, it is <tt>false</tt> if the field name
+  ends in a '?', <tt>nil</tt> otherwise.
+* <tt>nil</tt> is <b>always</b> allowed for a child field.
+* There are some conventions we follow religiously to help you:
+  * Field names that end in '?' are <b>always</b> true-or-false.
+  * <tt>NodeList</tt>-valued fields <b>always</b> default to an
+    empty <tt>NodeArray</tt> or <tt>NodeChain</tt>, so you can
+    tack things on there with <tt>&lt;&lt;</tt>, without worrying
+    about needing to create the list first.
+  * A field is <tt>Node</tt>-valued <b>if and only if</b> it is
+    a child field.
+  * The rows go yellow, green, yellow, green, ... .
+
 
 <table class="node_desc">
   <thead><tr>
@@ -681,7 +402,7 @@ end
 <pre>
     Declaration
         type: Int
-        declarators: 
+        declarators:
             - Declarator
                 name: "i"
             - Declarator
@@ -1832,18 +1553,18 @@ int main(int argc, char **argv) {
 CompoundLiteral
     type: Struct
         name: "S"
-    member_inits: 
+    member_inits:
         - MemberInit
             init: IntLiteral
                 val: 1
         - MemberInit
-            member: 
+            member:
                 - Member
                     name: "x"
             init: IntLiteral
                 val: 2
         - MemberInit
-            member: 
+            member:
                 - Member
                     name: "y"
                 - IntLiteral
@@ -2372,166 +2093,104 @@ CompoundLiteral
       See "Extensions" section below.
     </td>
   </tr>
-</tbody></table>
+</tbody>
+</table>
 
-<h3>Node Construction</h3>
+=== Node Construction
 
-<p>
-  Wanna make a <tt>Node</tt>?  Take your pick:
-</p>
-<ul>
-  <li>
-    <tt>#new(field1, field2, ...)</tt> -- fields are in the order
-    listed above.
-  </li>
-  <li>
-    <tt>#new(:field1 => val, :field2 => val, ...)</tt> -- field order
-    doesn't matter this way.
-  </li>
-  <li>
-    <tt>#new_at(pos, *args)</tt> -- set the <tt>pos</tt> to that
-    given, and pass <tt>args</tt> to <tt>#new</tt>.
-  </li>
-</ul>
+Wanna make a <tt>Node</tt>?  Take your pick:
 
-<p>
-  They're for losers, though.  What you really want to do is make
-  <tt>Node</tt>s by parsing C code.  Each class -- even the abstract
-  classes like <tt>Statement</tt> -- has a <tt>.parse</tt> method:
-<pre class="code_snippet">
-function_def = C::FunctionDef.<span class="code_highlight">parse</span> &lt;&lt;EOS
-  void frobnicate(int karma) {
-    use_waffle_iron();
-  }
-EOS
+* <tt>#new(field1, field2, ...)</tt> -- fields are in the order
+  listed above.
+* <tt>#new(:field1 => val, :field2 => val, ...)</tt> -- field order
+  doesn't matter this way.
+* <tt>#new_at(pos, *args)</tt> -- set the <tt>pos</tt> to that
+  given, and pass <tt>args</tt> to <tt>#new</tt>.
 
-stmt = C::Statement.<span class="code_highlight">parse</span>('while (not_looking) paint_car();')
-</pre>
-</p>
-<p>
-  Need to tell it to treat <tt>WaffleIron</tt> as a type name?  All
-  those <tt>parse</tt> methods use <tt>C.default_parser</tt>:
-<pre class="code_snippet">
-<span class="code_highlight">C.default_parser</span>.type_names << 'WaffleIron'
-type = C::Type.parse('WaffleIron')
-</pre>
+They're for losers, though.  What you really want to do is make
+<tt>Node</tt>s by parsing C code.  Each class -- even the abstract
+classes like <tt>Statement</tt> -- has a <tt>.parse</tt> method:
 
-<p>Alternatively, you could've given <tt>parse</tt> your own
-parser:</p>
+    function_def = C::FunctionDef.parse <<EOS
+      void frobnicate(int karma) {
+        use_waffle_iron();
+      }
+    stmt = C::Statement.parse('while (not_looking) paint_car();')
 
-<pre class="code_snippet">
-parser = C::Parser.new
-parser.type_names << 'WaffleIron'
-type = C::Type.parse('WaffleIron', <span class="code_highlight">parser</span>)
-</pre>
-</p>
-<p>
-  In fact, there's also <tt>C.parse(str, parser=nil)</tt>, which is an
-  alias for <tt>C::TranslationUnit.parse(str, parser)</tt>.
-</p>
-<pre class="code_snippet">
-ast = C.parse(STDIN)
-</pre>
-<p>
-  Yes, all that talk in the intro about doing <tt>parser =
-  C::Parser.new; parser.parse(...)</tt> was actually all a charade to
-  make you type more.  I so own you.
-</p>
+Need to tell it to treat <tt>WaffleIron</tt> as a type name?  All
+those <tt>parse</tt> methods use <tt>C.default_parser</tt>:
 
-<a name="open_issues"></a><h2>Extensions</h2>
-<p>
-  CAST has developed extensions!  To the C99 grammar, I mean.
-</p>
-<ul>
-  <li>
-    <tt>Type</tt>s are allowed as function arguments.  This lets you
-    parse macros like <tt>va_arg()</tt>.
-  </li>
-  <li>
-    <tt>Block</tt>s in parentheses are allowed as expressions (<a
-    href="http://gcc.gnu.org/onlinedocs/gcc-4.2.1/gcc/Statement-Exprs.html#Statement-Exprs">a
-    gcc extension</a>).  You need to call
-    <tt>#enable_block_expressions</tt> on the parser first.  They pop
-    out as <tt>BlockExpression</tt> nodes.
+    C.default_parser.type_names << 'WaffleIron'
+    type = C::Type.parse('WaffleIron')
 
-<pre class="code_snippet">
-C.default_parser.<span class="code_highlight">enable_block_expressions</span>
-node = C.parse 'char *brag(void) { return <span class="code_highlight">({"I\'m tricky!";})</span>; }'
-node.entities[0].def.stmts.last.expr.class  <span class="code_comment"># => C::BlockExpression</span>
-</pre>
-  </li>
-</ul>
+Alternatively, you could've given <tt>parse</tt> your own parser:
 
-<a name="open_issues"></a><h2>Open Issues</h2>
-<ul>
-  <li>
-    Is it okay to bastardize the <tt>=~</tt> operator like that?
-  </li>
-  <li>
-    Should binary operators have a list of expressions rather than
-    just 2?  That'd allow to_s to format the strings better in some
-    cases and make it consistent with Comma.
-  </li>
-  <li>
-    At the moment CAST chokes on preprocessor #-lines.  Ruby makes it
-    trivial to filter these out before passing the string to
-    <tt>Parser#parse</tt>, and this makes it obvious when you forget
-    to run a file through the preprocessor (which you need to do to
-    get type names at least once).  Is this stupid?  Ideally we should
-    probably have a builtin preprocessor and use that.
-  </li>
-</ul>
+    parser = C::Parser.new
+    parser.type_names << 'WaffleIron'
+    type = C::Type.parse('WaffleIron', parser)
 
-<p>
-  <a href="mailto:george.ogata@gmail.com">Vote now</a>.
-</p>
+In fact, there's also <tt>C.parse(str, parser=nil)</tt>, which is an
+alias for <tt>C::TranslationUnit.parse(str, parser)</tt>.
 
-<a name="to_do"></a><h2>To Do</h2>
-<ul>
-  <li>
-    Stop embarrasing yourself and write the parser in C.
-  </li>
-  <li>
-    Make it <tt>-wd</tt> friendly.
-  </li>
-  <li>
-    Fix the "TODO" bits in <tt>c.y</tt>.  These are for rarely used C
-    constructs, like the declaration <tt>int arr[*];</tt>.
-  </li>
-  <li>
-    Add a comment node.  Might make it useful for doc extraction.
-    Anyone want this?  Not all comments will be caught, though.
-    Comments can appear between any two tokens, and I don't really
-    want to add comment fields to every node.  They'd probably just
-    appear between toplevel entities (in
-    <tt>TranslationUnit#entities</tt>) and between statements (in
-    <tt>Block#stmts</tt>).
-  </li>
-  <li>
-    Make it rdoc-able.
-  </li>
-</ul>
+    ast = C.parse(STDIN)
 
-<p>
-  If any of these affect you greatly, <a
-  href="mailto:george.ogata@gmail.com">kick me</a> to make it happen
-  faster.
-</p>
+Yes, all that talk in the intro about doing <tt>parser =
+C::Parser.new; parser.parse(...)</tt> was actually all a charade to
+make you type more.  I so own you.
 
-<a name="to_do"></a><h2>Contact</h2>
+== Extensions
+
+CAST has developed extensions!  To the C99 grammar, I mean.
+
+* <tt>Type</tt>s are allowed as function arguments.  This lets you parse macros like <tt>va_arg()</tt>.
+* <tt>Block</tt>s in parentheses are allowed as expressions ((a gcc extension)[http://gcc.gnu.org/onlinedocs/gcc-4.2.1/gcc/Statement-Exprs.html#Statement-Exprs]). You need to call
+  <tt>#enable_block_expressions</tt> on the parser first.  They pop out as <tt>BlockExpression</tt> nodes.
+
+    C.default_parser.enable_block_expressions
+    node = C.parse 'char *brag(void) { return ({"I\'m tricky!";}); }'
+    node.entities[0].def.stmts.last.expr.class  # => C::BlockExpression
+
+== Open Issues
+
+* Is it okay to bastardize the <tt>=~</tt> operator like that?
+* Should binary operators have a list of expressions rather than
+  just 2?  That'd allow to_s to format the strings better in some
+  cases and make it consistent with Comma.
+* At the moment CAST chokes on preprocessor #-lines.  Ruby makes it
+  trivial to filter these out before passing the string to
+  <tt>Parser#parse</tt>, and this makes it obvious when you forget
+  to run a file through the preprocessor (which you need to do to
+  get type names at least once).  Is this stupid?  Ideally we should
+  probably have a builtin preprocessor and use that.
+
+{Vote now}[mailto:george.ogata@gmail.com]
+
+== To Do
+
+* Stop embarrasing yourself and write the parser in C.
+* Make it <tt>-wd</tt> friendly.
+* Fix the "TODO" bits in <tt>c.y</tt>.  These are for rarely used C
+  constructs, like the declaration <tt>int arr[*];</tt>.
+* Add a comment node.  Might make it useful for doc extraction.
+  Anyone want this?  Not all comments will be caught, though.
+  Comments can appear between any two tokens, and I don't really
+  want to add comment fields to every node.  They'd probably just
+  appear between toplevel entities (in
+  <tt>TranslationUnit#entities</tt>) and between statements (in
+  <tt>Block#stmts</tt>).
+* Make it rdoc-able.
+
+If any of these affect you greatly, {kick me}[mailto:george.ogata@gmail.com] to make it happen faster.
+
+== Contact
 
 I'm not really sure what people are going to try to use this for.  If
 there's some functionality you think would make a good addition, or
 think I've made a mess of this poor puppy, give me a yell.
 
-<p>
-  You can spam me at <a
-  href="mailto:george.ogata@gmail.com">george.ogata@gmail.com</a>.
-  It'd help if you prefixed the subject with "[cast] " so I can easily
-  distinguish CAST spam from fake Rolex spam.
-</p>
+You can spam me at george.ogata@gmail.com. It'd help if you prefixed the subject with "[cast] " so I can easily
+distinguish CAST spam from fake Rolex spam.
 
-</td></tr></table>  <!-- frame table -->
+== License
 
-</body>
-</html>
+Ruby License

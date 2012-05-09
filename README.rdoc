@@ -8,6 +8,10 @@ CAST parses C code into an abstract syntax tree (AST), lets you break it, then v
 
 This fork supports Ruby 1.9.3, gemspec, and requires Hoe. The Rubyforge page above is documentation for the original version, but most things should be the same.
 
+== Installation
+
+    gem install csquare-cast
+
 == Library Overview
 
 Everything is in the module <tt>C</tt>.

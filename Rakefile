@@ -14,13 +14,13 @@ require 'isolate/now'
 require 'hoe'
 
 Hoe.plugin :compiler
-Hoe.plugin :bundler
 Hoe.plugin :git
 
 h = Hoe.spec 'cast' do
   self.require_ruby_version ">=1.9"
   self.developer('George Ogata', 'george.ogata@gmail.com')
   self.readme_file = 'README.rdoc'
+  self.spec_extras[:name] = "csquare-cast"
 end
 
 task :default => :test

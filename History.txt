@@ -1,6 +1,7 @@
 === 0.2.2 / 2012-04-24
 
   * Switched to Hoe
+  * Gem package is now csquare-cast
 
 === 2012-03-02
 
